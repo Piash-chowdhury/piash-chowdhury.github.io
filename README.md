@@ -29,11 +29,11 @@ Settings > Pages > Build and deployment > Source: **GitHub Actions**. Every push
 
 ## Security model
 - Content-Security-Policy (meta tag): scripts, styles, and fonts from this site only; images from
-  this site plus the three map-tile hosts. No inline scripts, styles, or event handlers: keep JS in
+  this site plus Esri's map-tile host. No inline scripts, styles, or event handlers: keep JS in
   `assets/js/`, CSS in `site.css`.
 - No `innerHTML`; map popups, news tags, and the photo viewer use `textContent`/DOM nodes.
 - External links use `rel="noopener noreferrer"`; referrer policy `strict-origin-when-cross-origin`.
-- No third-party fonts or analytics. Only third-party requests: map tiles (CARTO, OSM, Esri).
+- No third-party fonts or analytics. Only third-party requests: Esri map tiles (no API key needed).
 - GitHub Pages can't send custom HTTP headers, so `frame-ancestors`/HSTS aren't available.
 
 ## Editing
