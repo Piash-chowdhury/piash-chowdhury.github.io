@@ -1,55 +1,45 @@
 # Piash Chowdhury — Portfolio
 
-A single-page personal research portfolio (coastal & estuarine science / GIS).
-Static site — no build step, no dependencies. Just HTML, CSS, and vanilla JS.
+Single-page research portfolio. Static HTML, CSS, and vanilla JS: no build step.
+
+Design: "Tracer". Estuary palette (blackwater ink, tannin brown, marsh green, sea-glass paper) with
+rhodamine pink as the one accent. The hero is a canvas illustration of a stylized estuary: particles
+ride a simple tide (river flow + sinusoidal tide, parabolic cross-channel profile, faster where the
+channel narrows, random-walk diffusion). Clicking the water releases a dye plume. It is labelled on
+the page as an illustration, not model output.
 
 ## Structure
 ```
-piash-portfolio/
-├── index.html              # the site
-├── 404.html                # custom not-found page
-├── assets/
-│   ├── css/style.css       # all styles
-│   ├── js/main.js          # theme, slideshow, map, lightbox, count-up
-│   └── Piash_Chowdhury_CV.pdf
-└── images/                 # portrait, thesis maps, gallery, logos, favicon
+index.html                 the site
+404.html                   not-found page (absolute /my-portfolio/ paths so it works at any depth)
+assets/css/site.css        all styles; colour tokens at the top (light + dark)
+assets/js/theme.js         sets light/dark before first paint (saved choice, else OS setting)
+assets/js/river.js         hero tide + dye illustration (pauses off-screen; static if reduced motion)
+assets/js/site.js          theme toggle, mobile menu, news "Upcoming" tags, photo viewer, Leaflet map
+assets/fonts/              Young Serif + Instrument Sans, self-hosted (OFL licences included)
+assets/vendor/leaflet/     Leaflet 1.9.4, self-hosted
+images/                    photos, maps, organisation logos (logo-*), favicon
+.github/workflows/static.yml   checks links, then deploys only the public files
 ```
 
-## Deploy to GitHub Pages
-1. Put the **contents** of this folder at the root of your `my-portfolio` repo
-   (so `index.html` sits at the top level, with `assets/` and `images/` beside it).
-2. Commit and push.
-3. In the repo: **Settings → Pages → Build and deployment → Source: Deploy from a branch**,
-   pick your branch (`main`) and folder (`/root`), Save.
-4. Your site goes live at `https://<username>.github.io/my-portfolio/`.
+## Deploy
+Settings > Pages > Build and deployment > Source: **GitHub Actions**. Every push to `main` runs
+`static.yml`: it fails if any local `src`/`href` points to a missing file, then publishes only
+`index.html`, `404.html`, `assets/`, and `images/`.
+
+## Security model
+- Content-Security-Policy (meta tag): scripts, styles, and fonts from this site only; images from
+  this site plus the three map-tile hosts. No inline scripts, styles, or event handlers: keep JS in
+  `assets/js/`, CSS in `site.css`.
+- No `innerHTML`; map popups, news tags, and the photo viewer use `textContent`/DOM nodes.
+- External links use `rel="noopener noreferrer"`; referrer policy `strict-origin-when-cross-origin`.
+- No third-party fonts or analytics. Only third-party requests: map tiles (CARTO, OSM, Esri).
+- GitHub Pages can't send custom HTTP headers, so `frame-ancestors`/HSTS aren't available.
 
 ## Editing
-- **Text/content:** edit `index.html`.
-- **Colors, spacing, fonts:** CSS custom properties at the top of `assets/css/style.css`
-  (light theme under `html[data-theme="light"]`, dark under `[data-theme="dark"]`).
-- **Journey map:** the world map is inline static SVG in `index.html` (no API keys, works offline).
-- **Gallery / research images:** drop files in `images/` and update the matching `<img>` / `data-full`.
-
-## Notes
-- Fonts load from Google Fonts with system fallbacks; the site works fine if that request is blocked.
-- Dark/light follows the visitor's OS preference and can be toggled in the nav.
-
-## Optional images to drop in (nice-to-have)
-The site works fully without these — each has a built-in graceful fallback — but adding
-them makes it richer. Drop files with these exact names into `images/`:
-
-| File | What it is | Where to get it |
-|------|-----------|-----------------|
-| `sjre.jpg` | St. Johns River photo (research card 01). Falls back to a live Wikimedia photo, then to a wave graphic. | Your own field photo, or a USGS/Wikimedia St. Johns River image. |
-| `logo-gw.png` | Genesee & Wyoming logo (experience). Falls back to a "G&W" badge. | gwrr.com press/brand assets. |
-| `logo-spekter.png` | Spekter GmbH logo (experience). Falls back to a "SPEKTER" badge. | spekter.de. |
-
-Transparent PNGs (square-ish) look best for the logos.
-
-## Interactive map
-The Journey section uses **Leaflet** (self-hosted in `assets/vendor/leaflet/`, so it always loads).
-Base map tiles come from OpenStreetMap / CARTO / Esri at runtime — visitors need internet for the
-map imagery, but the markers, journey path, zoom, and layer switcher work regardless. Marker data
-lives in `assets/js/main.js` (the `stops` array) — edit coordinates or text there.
-
-Optional remaining logo: `images/logo-spekter.png` (falls back to a "SPEKTER" badge). UNF and G&W logos are included.
+- News: add an `<li class="note" data-date="YYYY-MM-DD">` at the top of `#news`. Future dates get
+  an "Upcoming" tag automatically.
+- Organisation logos: `<a class="org" href="(official site)">` wrapping an `<img>` from `images/`.
+  Logos belong to their owners and are used only to identify affiliations.
+- Map stops: `stops` in `assets/js/site.js`.
+- Anything placed in `images/` or `assets/` becomes public.
