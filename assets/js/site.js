@@ -92,10 +92,14 @@
   map.on('focus', function () { map.scrollWheelZoom.enable(); });
   map.on('blur', function () { map.scrollWheelZoom.disable(); });
 
-  var light = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 20, attribution: '&copy; OpenStreetMap contributors, &copy; CARTO' });
-  var streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' });
-  var sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles &copy; Esri' });
-  light.addTo(map);
+  // Esri basemaps (no API key needed). CARTO now requires a key; OSM blocks this use.
+  var ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services/';
+  function esri(name, attr) { return L.tileLayer(ESRI + name + '/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16, attribution: attr || 'Tiles &copy; Esri' }); }
+  var gray = L.layerGroup([esri('Canvas/World_Light_Gray_Base', 'Tiles &copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors'), esri('Canvas/World_Light_Gray_Reference', '')]);
+  var darkGray = L.layerGroup([esri('Canvas/World_Dark_Gray_Base', 'Tiles &copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors'), esri('Canvas/World_Dark_Gray_Reference', '')]);
+  var streets = esri('World_Street_Map', 'Tiles &copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors');
+  var sat = esri('World_Imagery', 'Tiles &copy; Esri, Maxar, Earthstar Geographics');
+  (root.getAttribute('data-theme') === 'dark' ? darkGray : gray).addTo(map);
 
   var pName = $('jpName'), pSub = $('jpSub'), pDesc = $('jpDesc');
   var pathGrp = L.layerGroup().addTo(map), siteGrp = L.layerGroup().addTo(map), line = [];
@@ -119,7 +123,7 @@
   });
 
   var journey = L.polyline(line, { color: COLOR.path, weight: 2.5, opacity: 0.7, dashArray: '6 7' }).addTo(map);
-  L.control.layers({ 'Light': light, 'Streets': streets, 'Satellite': sat },
+  L.control.layers({ 'Light gray': gray, 'Dark gray': darkGray, 'Streets': streets, 'Satellite': sat },
     { 'Journey path': journey, 'Field sites': siteGrp }).addTo(map);
   map.fitBounds(L.latLngBounds(stops.map(function (p) { return p.ll; })).pad(0.15));
   window.addEventListener('load', function () { map.invalidateSize(); });
