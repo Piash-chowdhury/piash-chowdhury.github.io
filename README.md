@@ -11,7 +11,7 @@ the page as an illustration, not model output.
 ## Structure
 ```
 index.html                 the site
-404.html                   not-found page (absolute /my-portfolio/ paths so it works at any depth)
+404.html                   not-found page (root-absolute paths so it works at any depth)
 assets/css/site.css        all styles; colour tokens at the top (light + dark)
 assets/js/theme.js         sets light/dark before first paint (saved choice, else OS setting)
 assets/js/river.js         hero tide + dye illustration (pauses off-screen; static if reduced motion)
